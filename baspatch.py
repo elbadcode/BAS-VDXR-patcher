@@ -44,12 +44,14 @@ def replace_dll(game_path):
             os.remove(plugin_path)
         except FileNotFoundError:
             pass
-        shutil.move(my_dll_path, plugin_path)
+        shutil.copyfile(my_dll_path, plugin_path)
         if os.path.exists(plugin_path):
             print('success!')
             return True
     except Exception as e:
-        print(e)
+        os.chdir(os.path.dirname(my_dll_path))
+        with open("ErrorLog.txt", "w") as f:
+            print(e,file=f)
         return False
 
 def get_game_path():
