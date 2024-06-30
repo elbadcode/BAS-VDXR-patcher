@@ -51,6 +51,19 @@ def replace_dll(game_path):
             os.rename("OVRPlugin.dll", "OVRPlugin.bak")
         #on subsequent runs this will always occur
         except FileExistsError:
+            #check for existing replacement dll
+            try:
+                ppe = pefile.PE(plugin_path)
+                ppeDT = ppe.FILE_HEADER.TimeDateStamp
+                print(ppeDT)
+                if ppeDT == myPEdt and os.path.getsize(plugin_path) == 9701432:
+                    tk.showinfo('Success', 'DLL already replaced')
+                    return True
+            except Exception as e:
+                os.chdir(base_dir)
+                with open("ErrorLog.txt", "w") as f:
+                    print(e, file=f)
+                return False
             backup = os.path.join(plugins,"OVRPlugin.bak")
             #remove any nonsense backups of the modded plugin and remove if the current plugin is newer than backup
             if os.path.getsize(backup) == os.path.getsize(my_dll_path) or os.path.getmtime(plugin_path) >= os.path.getmtime(backup):
@@ -137,4 +150,3 @@ if get_game_path():
 else:
     tk.showwarning("Error", "Something went wrong, try again with both files in the game directory or install the dll manually")
     exit()
-    
